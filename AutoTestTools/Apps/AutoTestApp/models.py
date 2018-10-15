@@ -14,9 +14,12 @@ class Tag(models.Model):
 	documentation = models.TextField(verbose_name="标签描述")
 	del_flag = models.IntegerField(default=0, editable=False)
 
+	person = models.ForeignKey(AUser,verbose_name='功能负责人',blank=True,null=True)
+
 	class Meta:
 		verbose_name = "用例标签"
 		verbose_name_plural = verbose_name
+		ordering = ['tagName']
 
 	def __str__(self):
 		return self.tagName
@@ -37,6 +40,7 @@ class Data(models.Model):
 	class Meta:
 		verbose_name = "用例参数"
 		verbose_name_plural = verbose_name
+		ordering = ['varName']
 
 	def __str__(self):
 		return self.varName + "=" + self.value
@@ -53,6 +57,7 @@ class Business_basic(models.Model):
 	class Meta:
 		verbose_name = "基础业务"
 		verbose_name_plural = verbose_name
+		ordering = ['name']
 
 	def doc(self):
 		if len(str(self.documentation)) > 60:
@@ -76,6 +81,7 @@ class User(models.Model):
 	class Meta:
 		verbose_name = "用户信息"
 		verbose_name_plural = verbose_name
+		ordering = ['name']
 
 	def __str__(self):
 		return self.name + "_" + self.reqchannel
@@ -85,25 +91,32 @@ class Business(models.Model):
 	id = models.AutoField(primary_key=True)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="执行者")
 	bus_basic = models.ForeignKey(Business_basic, on_delete=models.CASCADE, verbose_name="业务名称")
-	params = models.ManyToManyField("Data", verbose_name="输入参数名", blank=True, help_text="从参数列表中选择")
+	params = models.ManyToManyField(Data, verbose_name="输入参数名", blank=True, help_text="从参数列表中选择")
 	sort = models.IntegerField(verbose_name="排序", default=999)
 	date = models.DateField(auto_now=True)
 	del_flag = models.IntegerField(default=0, editable=False)
 
-	def get_param(self):
-		params = [p.varName + ":" + p.value for p in self.params.all()]
-		return ";".join(params)
+	def data(self):
+		params = [p.varName + "=" + p.value for p in self.params.all()]
+		return ";\n".join(params)
+
+	def bus(self):
+		return [b.name for b in Business_basic.objects.filter(id=self.bus_basic_id)][0]
+
+	def userinfo(self):
+		return [u.name + "_" + u.reqchannel for u in User.objects.filter(id=self.user_id)][0]
 
 	class Meta:
 		verbose_name = "用例流程"
 		verbose_name_plural = verbose_name
+		ordering = ['user_id', 'bus_basic_id']
 
 	def __str__(self):
 		sql_b = Business_basic.objects.get(id=self.bus_basic_id)
 		sql_u = User.objects.get(id=self.user_id)
-		data = str(sql_u.userId) +"-"+ sql_b.name + " "
-		if self.get_param():
-			return data + "(" + self.get_param() + ")"
+		data = str(sql_u.userId) + "-" + sql_b.name + " "
+		if self.data():
+			return data + "(" + self.data() + ")"
 		else:
 			return data
 
@@ -112,14 +125,14 @@ class Case(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=50, verbose_name="用例名称", unique=True)
 	isrun = models.IntegerField(choices=((1, "执行"), (2, "不执行")), default=1, verbose_name="是否执行")
-	tags = models.ManyToManyField('Tag', blank=True, verbose_name="用例标识")
+	tags = models.ManyToManyField(Tag, blank=True, verbose_name="用例标识")
 	business = models.ManyToManyField('Business', verbose_name="用例流程")
 	documentation = models.TextField(verbose_name="用例描述", blank=True)
 	sort = models.IntegerField(verbose_name="排序", default=999)
 	date = models.DateField(auto_now=True)
 	del_flag = models.IntegerField(default=0, editable=True)
 
-	writer = models.ForeignKey(AUser,on_delete=models.CASCADE)
+	writer = models.ForeignKey(AUser,on_delete=models.CASCADE,blank=True,null=True)
 
 	def doc(self):
 		if len(str(self.documentation)) > 60:
@@ -127,11 +140,16 @@ class Case(models.Model):
 		else:
 			return str(self.documentation)
 
+	def allTags(self):
+		return ",".join([t.tagName for t in self.tags.all()])
 
+	def caseid(self):
+		return 'TestCase' +  str(self.id).zfill(3)
 
 	class Meta:
 		verbose_name = "测试用例"
 		verbose_name_plural = verbose_name
+		ordering = ['sort']
 
 	def __str__(self):
 		return self.name

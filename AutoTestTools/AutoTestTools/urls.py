@@ -22,9 +22,8 @@ from Apps.AutoTestApp import views
 from AutoTestTools import settings
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^$', views.index, name='index'),
     url(r'^xadmin/', xadmin.site.urls),
-    url(r'^index/', views.index, name='index'),
     url(r'^case/del_data', views.del_data, name='del_data'),
     url(r'^case/sort', views.sort, name='sort'),
     url(r'^case/create_case', views.create_case, name='create_case'),

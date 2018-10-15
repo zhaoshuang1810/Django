@@ -6,8 +6,8 @@ python manage.py startapp app_name
 或 django-admin.py startapp app_name
 
 #创建数据库表
-python manage.py makemigrations
-python manage.py migrate
+python3 manage.py makemigrations
+python3 manage.py migrate
 
 #创建用户
 python manage.py createsuperuser

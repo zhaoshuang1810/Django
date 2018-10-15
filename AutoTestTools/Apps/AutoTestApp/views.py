@@ -38,7 +38,7 @@ def search_keywords(data, **kwargs):
 
 
 def index(request):
-	return render(request, 'qqq.html')
+	return render(request, 'index.html')
 
 
 def test(request):
