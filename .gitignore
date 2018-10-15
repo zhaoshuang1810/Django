@@ -4,12 +4,7 @@
 *.DS_Store
 
 # 忽略文件夹
-__pycache__/*
-
-# 忽略.idea
+__pycache__/
+migrations/
+!migrations/__init__.py
 .idea/
-
-# 除了init文件，其他日志文件均删除
-migrations/*
-# !migrations/__init__.py
-
