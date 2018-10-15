@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block mainbody %}
+
+    <div id="content_case">
+        <h1><a href="/test/">用例组件一览表</a></h1>
+        <header id="site-header" class="content_width">
+            <div id="header-search-box">
+                <form action="case" role="search" method="get" id="searchform" action="{% url 'case' %}">
+                    {% csrf_token %}
+                    <select type="search" id="channel" name="channel" required>
+                        {% for op in channel %}
+                            {% if selectChannel == op.1 %}
+                                <option id="{{ op.0 }}" value="{{ op.1 }}" selected>{{ op.1 }}</option>
+                            {% else %}
+                                <option id="{{ op.0 }}" value="{{ op.1 }}">{{ op.1 }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="submit"><span class="ion-ios-search-strong">搜 索</span></button>
+                </form>
+            </div>
+        </header>
+
+        <div class="content_width">
+            <span>
+                <form action="run_tagcase" method="get" style="margin:0px;display:inline;">
+                    <span>Include：</span>
+                    <input  type="text" name="include" id="include" placeholder="输入执行时包含的标签……">
+                    <span>Exclude：</span>
+                    <input  type="text" name="exclude" id="exclude" placeholder="输入执行时不包含的标签……">
+                    <input type="hidden" value={{ selectChannel }} name="channel" id="editChannel"/>
+                     <button class="tc" type="button"
+                             onclick="run_tagcase_fun('{{ selectChannel }}')">按输入条件执行用例</button>
+                 </form>
+                <button class="tc"><a href="../media/results/report.html" target="_blank"
+                                      type="button">查看用例执行报告</a></button>
+                <button class="tc"><a href="../historyreport" target="_blank"
+                                      type="button">查看历史执行报告</a></button>
+            </span>
+            <span>
+                <button class="tc_r"><a href="../case" target="_blank" type="button">编辑用例</a></button>
+            </span>
+        </div>
+        <div>
+            <table>
+                <tr>
+                    <th width="50" class="text tableTextCenter">序号</th>
+                    <th width="200" class="text tableTextCenter">组件名称</th>
+                    <th class="text tableTextCenter">组件内用例详情
+                        <hr>
+                        用例名称||用例标签||用例描述
+                    </th>
+                    <th width="200" class="text tableTextCenter">操作</th>
+                </tr>
+
+                {% for k,v in data.items %}
+                    {% csrf_token %}
+                    <tr>
+                        <td class="text tableTextCenter">{{ forloop.counter }}</td>
+                        <td class="text tableTextCenter" name="name" value={{ k }}>{{ k }}.robot</td>
+                        <td>
+                            {% for kk,vv in v.items %}
+                                <div>
+                                    <span>{{ forloop.counter }}、{{ kk }} </span>
+                                    ||
+                                    {% if 'NotRun' in  vv.tag  %}
+                                         <span style="color:red">{{ vv.tag }} </span>
+                                        {% else %}
+                                         <span style="color:blue">{{ vv.tag }} </span>
+                                    {% endif %}
+                                    ||
+                                    <span>{{ vv.doc }} </span>
+                                </div>
+                                <hr>
+                            {% endfor %}
+                        </td>
+                        <td class="text tableTextCenter">
+                            <button class="button_table" type="button" onclick="run_case_fun('{{ selectChannel }}','{{ k }}')">执行用例组件
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

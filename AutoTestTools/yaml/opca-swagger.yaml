@@ -1,0 +1,142 @@
+swagger: "2.0"
+info:
+  description: ""
+  version: "1.0.0"
+  title: "流量中心-api"
+
+host: "pending"
+basePath: "/v2"
+
+schemes:
+- "https"
+- "http"
+paths:
+  /acquisition/award:
+    post:
+      tags:
+        - "ocpa"
+      summary: "请求领取福利"
+      description: "用于触发用户请求"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "request"
+        in: "body"
+        description: "领取福利的请求信息，包括手机号和触发时间"
+        required: true
+        schema:
+          $ref: "#/definitions/FormRequest"
+      responses:
+        '200':
+          description: "返回处理结果，参考#/definitions/AwardResult"
+          schema:
+            $ref: "#/definitions/AwardResult"
+        '500':
+          description: "Application Exception"
+  /acquisition/form:
+    get:
+      tags:
+        - "ocpa"
+      summary: "福利表单是否完成"
+      description: "福利表单是否完成"
+      produces:
+      - "application/json"
+      parameters:
+        - name: phoneNum
+          in: query
+          description: 手机号
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              alreadyDone:
+                type: boolean
+                description: 之前是否完成表单
+    post:
+      tags:
+        - "ocpa"
+      summary: "福利表单信息上传"
+      description: "福利表单新上传"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "request"
+        in: "body"
+        description: "福利表单信息上传"
+        required: true
+        schema:
+          $ref: "#/definitions/AwardRequest"
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              done:
+                type: boolean
+                description: 本次是否完成表单
+              alreadyDone:
+                type: boolean
+                description: 之前是否完成表单
+        '500':
+          description: "Application Exception"
+
+definitions:
+  AwardRequest:
+    type: "object"
+    properties:
+      phoneNum:
+        type: "string"
+        description: "手机号码"
+      answerDesc:
+        type: "string"
+        description: "回答详情"
+      flowNum:
+        type: "integer"
+        description: "流量，单位：m 例如：200.500,1024"
+      correctNum:
+        type: "integer"
+        description: "正确个数"
+      userInfo:
+        $ref: "#/definitions/UserInfoDemo"
+      data:
+        type: "string"
+        description: "加密串"
+  UserInfoDemo:
+    type: "object"
+    properties:
+      username:
+        type: "string"
+        description: "姓名"
+      age:
+        type: "string"
+        description: "年龄"
+      education:
+        type: "string"
+        description: "学历"
+  FormRequest:
+    type: "object"
+    properties:
+      phone:
+        type: "string"
+        description: "手机号码"
+      userIdAtCaller:
+        type: "string"
+        description: "请求领取福利方的用户标识"
+      requestTime:
+        type: "string"
+        description: "触发请求时间，格式：yyyyMMddHHmmss"
+  AwardResult:
+    type: "object"
+    properties:
+      status:
+        type: "integer"
+        description: "[1:'接收成功',0:'手机号不存在',-1:'未获得福利',-2:'福利发放中']"
+      msg:
+        type: "string"
+

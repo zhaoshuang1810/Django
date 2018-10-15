@@ -1,0 +1,23 @@
+#创建项目
+django-admin.py startproject project_name
+
+#创建App
+python manage.py startapp app_name
+或 django-admin.py startapp app_name
+
+#创建数据库表
+python manage.py makemigrations
+python manage.py migrate
+
+#创建用户
+python manage.py createsuperuser
+
+#输出日志
+import logging
+logger = logging.getLogger('django')
+logger.info(count)
+
+#启动服务器命令
+python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 172.16.165.133:8000
+python manage.py runserver 172.16.165.85:8000

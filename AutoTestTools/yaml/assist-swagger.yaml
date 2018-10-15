@@ -1,0 +1,357 @@
+swagger: '2.0'
+info:
+  description: ''
+  version: 2.1.0
+  title: 助力api
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: zhangbo08@sanlands.com
+host: 127.0.0.1
+basePath: /api/v2/assist
+tags:
+  - name: Assist
+    description: 助力
+
+schemes:
+  - https
+paths:
+  /assist:
+    post:
+      tags:
+        - Assist
+      summary: 创建助力活动
+      description: 用户创建助力活动
+      parameters:
+        - in: body
+          name: assistParam
+          description: 助力参数对象
+          schema:
+            type: object
+            required:
+              - targetObjectId
+              - type
+            properties:
+              targetObjectId:
+                type: integer
+                format: int64
+                description: 需助力的目标对象id
+              type:
+                type: string
+                description: 助力类型
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            description: 返回结果参数
+            properties:
+              result:
+                type: boolean
+                description: 是否创建成功
+              message:
+                type: string
+                description: 结果描述信息(例：每日只能解锁3门课程，请明天再来！)
+
+    get:
+      tags:
+        - Assist
+      summary: 助力详情
+      description: 助力详情
+      parameters:
+        - name: targetObjectId
+          in: query
+          description: 需助力的目标对象id
+          required: true
+          type: integer
+          format: int64
+        - name: mark
+          in: query
+          description: 用户标识
+          required: false
+          type: string
+        - name: type
+          in: query
+          description: 助力活动类型
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/AssistDemo'
+
+  /assist/share:
+    get:
+      tags:
+        - Assist
+      summary: 分享助力活动
+      description: 用户分享助力活动
+      parameters:
+        - in: query
+          name: shareMark
+          required: true
+          type: string
+          description: 分享标识（识别用户）
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: boolean
+            description: 是否成功
+
+  /assist/join:
+    post:
+      tags:
+        - Assist
+      summary: 好友助力
+      description: 好友助力
+      parameters:
+        - in: body
+          name: assistParam
+          description: 助力参数对象
+          schema:
+            type: object
+            required:
+              - targetObjectId
+              - type
+            properties:
+              targetObjectId:
+                type: integer
+                format: int64
+                description: 需助力的目标对象id
+              type:
+                type: string
+                description: 助力类型
+              mark:
+                type: string
+                description: 用户标识
+              extentionObject:
+                type: string
+                description: 扩展字段内容
+              timeFlag:
+                type: string
+                description: 时间戳（防篡改）
+              signature:
+                type: string
+                description: 加密字符串
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            description: 返回信息
+            properties:
+              result:
+                type: boolean
+                description: 是否创建成功
+              message:
+                type: string
+                description: 结果描述信息(次数不足/成功等)
+  
+  /assist/list:             
+    get:
+      tags:
+        - Assist
+      summary: 助力列表
+      description: 根据助力类型查询当前用户助力列表
+      parameters:
+        - name: type
+          in: query
+          description: 助力活动类型，多个用字符串拼接，逗号隔开
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/UserAssistDemo' 
+  /assist/joinNum:
+    get:
+      tags:
+        - Assist
+      summary: 参加某项助力活动的人数
+      description: 参加某项助力活动的人数
+      parameters:
+        - name: type
+          in: query
+          description: 助力活动类型，多个用字符串拼接，逗号隔开
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            description: 助力人数
+            properties:
+              joinNum: 
+                type: integer
+                description: 参加某项助力活动的人数
+  '/assist/restart/{assistId}':
+    post:
+      tags:
+        - Assist
+      summary: 重新开始
+      description: 助力重新开始，之前的助力都清零
+      parameters:
+        - in: path
+          name: assistId
+          description: 助力id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: boolean
+            description: 返回信息
+
+definitions:  
+  AssistDemo:
+    type: object
+    description: 助力详情信息
+    properties:
+      self:
+        type: boolean
+        description: 是否是自己
+      alreadyAssist:
+        type: boolean
+        description: 是否对一个助力对象发起过助力
+      selfResidueAssistNum:
+        type: integer
+        description: 自己剩余的助力次数
+      friendsResidueAssistNum:
+        type: integer
+        description: 给朋友助力的剩余次数
+      id:
+        type: integer
+        description: 助力id
+      userId:
+        type: integer
+        description: 用户id
+      nickName:
+        type: string
+        description: 昵称
+      headImageUrl:
+        type: string
+        description: 头像url
+      targetObjectId:
+        type: integer
+        description: 助力对象id 
+      objectiveId:
+        type: integer
+        description: 助力活动id
+      objectiveName:
+        type: string
+        description: 助力活动名称
+      status:
+        type: integer
+        description: 助力状态
+      createTime:
+        type: string
+        description: 助力开始时间
+      peopleNum:
+        type: integer
+        description: 现有助力人数
+      needPeopleNum:
+        type: integer
+        description: 需要助力人数
+      selfAssistNum:
+        type: integer
+        description: 自己可助力的最大次数
+      objectiveType:
+        type: string
+        description: 助力活动类型（用枚举表示）
+      objectiveUrl:
+        type: string
+        description: 与助力活动相关的url
+      assistUserList:
+        type: array
+        description: 好友助力详情
+        items:
+          $ref: '#/definitions/FriendAssistDemo'
+  FriendAssistDemo:
+    type: object
+    description: 好友助力信息
+    properties:
+      assistDetailId:
+        type: integer
+        description: 助力明细id
+      assistUserId:
+        type: integer
+        description: 助力人用户id
+      nickName:
+        type: string
+        description: 昵称
+      headImageUrl:
+        type: string
+        description: 头像url
+      extentionObject:
+        type: string
+        description: 扩展对象
+      self:
+        type: boolean
+        description: 是否是给自己助力
+  UserAssistDemo:
+    type: object
+    description: 用户助力信息
+    properties:
+      userId:
+        type: integer
+        description: 用户id
+      nickName:
+        type: string
+        description: 昵称
+      headImageUrl:
+        type: string
+        description: 头像url
+      finishOne:
+        type: boolean
+        description: 是否有一个已经助力完成
+      hasOneUnderWay:
+        type: boolean
+        description: 是否有一个正在助力进行中
+      activityOnTime:
+        type: boolean
+        description: 活动是否在活动期内
+      assistInfoList:
+        type: array
+        description: 用户创建的助力列表
+        items:
+          properties:
+            assistId:
+              type: integer
+              description: 助力id
+            type:
+              type: string
+              description: 助力活动类型（用枚举表示）
+            targetObjectId:
+              type: integer
+              description: 需助力的对象id(七夕节为图片)
+            status:
+              type: integer
+              description: 助力状态（1：进行中 10：已完成 20：未完成）
+            peopleNum:
+              type: integer
+              description: 当前助力人数
+            objectiveId:
+              type: integer
+              description: 助力活动id
+            objectiveName:
+              type: string
+              description: 助力活动名称
+            needPeopleNum:
+              type: integer
+              description: 需要助力人数
+            selfAssistNum:
+              type: integer
+              description: 自己可助力的最大次数
+            objectiveUrl:
+              type: string
+              description: 与助力活动相关的url
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'

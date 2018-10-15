@@ -1,0 +1,157 @@
+swagger: '2.0'
+info:
+  description: ''
+  version: 2.1.0
+  title: 消息服务api
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: zhangbo08@sanlands.com
+host: 127.0.0.1
+basePath: /api/v2/message
+tags:
+  - name: message
+    description: 消息服务
+schemes:
+  - https
+paths:
+  /:
+    post:
+      tags:
+        - message
+      summary: 发送消息
+      description: 发送短息，模板消息，邮件等
+      parameters:
+        - in: body
+          name: 消息体
+          schema:
+            type: object
+            $ref: '#/definitions/MessageBase' 
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/MessageResult' 
+  /verify:
+    get:
+      tags:
+        - message
+      summary: 验证验证码
+      description: 验证验证码
+      parameters:
+        - name: phoneNum
+          in: query
+          description: 手机号
+          required: true
+          type: string
+        - name: code
+          in: query
+          description: 验证码
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/MessageResult' 
+definitions:  
+  MessageBase:
+    type: object
+    description: 消息参数
+    properties:
+      templateId:
+        type: string
+        description: 模板id
+      to:
+        type: string
+        description: 接收人：手机号，邮箱地址或openId
+      params:
+        allOf:
+          - $ref: '#/definitions/SmsParams' 
+          - $ref: '#/definitions/MailParams'
+          - $ref: '#/definitions/TemdParams'
+        description: 消息体：发送短信时为字符数组["sdf","sdfsd"],发送邮件时为Map {"key1":"value1","key2","value2"},发送消息模板Map {"keyword1", {"velue":"velue1","color","color"},"keyword1", {"velue":"velue1","color","color"}}
+      reqChannel:
+        type: string
+        description: 渠道
+      type:
+        type: string
+        description: 'Email,Template,SMS, Public  默认Template'
+      page:
+        type: string
+        description: 需要跳转的地址
+      emphasis:
+        type: string
+        description: 邮箱标题，小程序消息模板放大字段
+      pushType:
+        type: string
+        description: 发送的功能类型：消息模板必填
+      deviceType:
+        type: string
+        description: 设备类型
+  SmsParams:
+    type: array
+    description: 短息参数
+    items:
+      type: string
+  MailParams:
+    type: object
+    description: 邮箱模板有多个自定义参数
+    properties:
+      key1:
+       type: string
+       description: 根据模板传键
+      key2:
+       type: string
+       description: 根据模板传键
+  TemdParams:
+    type: object
+    description: 消息模板所需参数 有多个看keyword
+    properties:
+      keyword1:
+       type: object
+       description: 根据模板传键
+       properties:
+          value:
+           type: string
+           description: 模板值
+          color:
+           type: string
+           description: 颜色值
+       
+      keyword2:
+       type: object
+       description: 根据模板传键
+       properties:
+          value:
+           type: string
+           description: 模板值
+          color:
+           type: string
+           description: 颜色值
+  MessageResult:
+    type: object
+    description: 返回参数
+    properties:
+      code:
+        type: integer
+        description: 返回编码
+      message:
+        type: string
+        description: 返回描述   SUCCESS(0, "成功"),
+                                FAILURE(1000, "失败"),
+                                TEMPLATE_LIMIT(1001, "消息模板超出每天限制数量"),
+                                TOKEN_NULL(1002, " 获得缓存token信息 为 null"),
+                                FROM_ID_NOT_EXIST(1003, " 未找到有效的fromId"),
+                                ERROR_MAX(1004,"超过最大次数"),
+                                ERROR_FAST_SECOND(1005,"频率过快, 30 秒"),
+                                ERROR_FAST_HOUR(1006,"频率过快, 1小时"),
+                                ERROR_FORMAT(1007,"手机号格式错误"),
+                                TIME_OUT(1008,"验证码超时"),
+                                CODE_WRONG(1009,"验证码错误"),
+                                OTHER_ERROR(2001, "其他错误"),
+                                TO_NOT_EXIST(3001, "接收人不能为空")"
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'

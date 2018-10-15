@@ -1,0 +1,15 @@
+# "#"代表注释，"*"代表通配多个字符，"?"代表通配单个字符，"!"代表取反
+# 忽略pyc文件
+*.pyc
+*.DS_Store
+
+# 忽略文件夹
+__pycache__/*
+
+# 忽略.idea
+.idea/
+
+# 除了init文件，其他日志文件均删除
+migrations/*
+# !migrations/__init__.py
+

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh_hans">
+<head>
+    <meta charset="UTF-8">
+    <title>自动化测试</title>
+    <meta name="robots" content="NONE,NOARCHIVE"/>
+</head>
+
+<style>
+    table,table tr th, table tr td { border:1px solid black;}
+    table{
+        float: left;
+        width: 1800px;
+        height: auto;
+        padding: 0px 0px 100px 0px;
+    }
+
+    .tableTextCenter {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    #content_case {
+        width: auto;
+        height: auto;
+        padding: 10px 40px;
+    }
+    .button_table{
+        width: 126px;
+        height: 36px;
+        border-radius:15px;
+        background-color: #5897fb;
+        color: #ffffff;
+    }
+
+    .tc {
+        width: 150px;
+        height: 36px;
+        margin: 0px 10px 0px 0px;
+        background-color: #ffffcc;
+        color: #1155cc;
+    }
+
+    .tc_r {
+        float: right;
+        width: 100px;
+        height: 36px;
+        margin: 0px 10px 0px 0px;
+        background-color: #ddffdd;
+    }
+
+    .content_width {
+        float: left;
+        width: 1800px;
+        height: auto;
+        padding: 0px 0px 10px 0px;
+
+    }
+
+</style>
+
+<body class=" dashboard" data-admin-utc-offset="0" >
+
+    <!-- END Header -->
+    {% block mainbody %}
+        <p>original</p>
+    {% endblock %}
+</div>
+<!-- END Container -->
+
+<script type="text/javascript"
+        src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+    //checkbox 全选/取消全选
+    var isCheckAll = false;
+
+    function swapCheck() {
+        if (isCheckAll) {
+            $("input[type='checkbox']").each(function () {
+                this.checked = false;
+            });
+            isCheckAll = false;
+        } else {
+            $("input[type='checkbox']").each(function () {
+                this.checked = true;
+            });
+            isCheckAll = true;
+        }
+    }
+
+    function del_data_fun() {
+        var number = '';
+        $('input:checkbox[name=goods]:checked').each(function (k) {
+            if (k == 0) {
+                number = $(this).val();
+            } else {
+                number += ',' + $(this).val();
+            }
+        })
+
+        $.ajax({
+            type: "GET",  //提交方式
+            url: "/case/del_data",//路径
+            data: {
+                "del": number
+            },//数据，这里使用的是Json格式进行传输
+            success: function (result) {//返回数据根据结果进行相应的处理
+                if (result.success) {
+                    alert("成功")
+                    window.location.reload()
+                } else {
+                    alert("失败")
+                }
+            }
+        });
+    }
+
+    function create_case_fun(channel) {
+        var number = '';
+        $('input:checkbox[name=goods]:checked').each(function (k) {
+            if (k == 0) {
+                number = $(this).val();
+            } else {
+                number += ',' + $(this).val();
+            }
+        })
+
+        $.ajax({
+            type: "GET",  //提交方式
+            url: "/case/create_case",//路径
+            data: {
+                "create": number,
+                "channel": channel
+            },//数据，这里使用的是Json格式进行传输
+            success: function (result) {//返回数据根据结果进行相应的处理
+                if (result.success) {
+                    if(number.length==0){
+                         alert("请选择要执行的用例！")
+                    }else {
+                        alert("用例执行完成！")
+                    }
+                    window.location.reload()
+                } else {
+                    alert("失败")
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $(".nt").click(sortName);
+    })
+
+    sortName = function () {
+        $tr = $(this).parents('tr')
+        $id = $tr.find(".nt").attr("trId");
+        $sort = $tr.find(".ns").val();
+        $.ajax({
+            type: "GET",  //提交方式
+            url: "/case/sort",//路径
+            data: {
+                "id": $id, "sort": $sort
+            },//数据，这里使用的是Json格式进行传输
+            success: function (result) {//返回数据根据结果进行相应的处理
+                if (result.success) {
+                    window.location.reload()
+                } else {
+                    alert("失败")
+                }
+            }
+        });
+    }
+
+    function run_case_fun(channel,suitename) {
+        $.ajax({
+            type: "GET",  //提交方式
+            url: "/test/run_case",//路径
+            data: {
+                'channel':channel,"suitename": suitename
+            },//数据，这里使用的是Json格式进行传输
+            success: function (result) {//返回数据根据结果进行相应的处理
+                if (result.success) {
+                    alert("用例执行完成！")
+                    window.location.reload()
+                } else {
+                    alert("失败")
+                }
+            }
+        });
+    }
+
+    function run_tagcase_fun(channel) {
+            var include = $("#include").val()
+            var exclude = $("#exclude").val()
+            $.ajax({
+                type: "GET",  //提交方式
+                url: "/test/run_tagcase",//路径
+                data: {
+                    'channel':channel,'include':include,'exclude':exclude
+                },//数据，这里使用的是Json格式进行传输
+                success: function (result) {//返回数据根据结果进行相应的处理
+                    if (result.success) {
+                        alert("用例执行完成！")
+                        window.location.reload()
+                    } else {
+                        alert("失败")
+                    }
+                }
+            });
+        }
+
+
+    {#强制刷新#}
+
+    function setCookie(name, value, iDay) {
+        var oDate = new Date();
+
+        oDate.setDate(oDate.getDate() + iDay);
+
+        document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + oDate;
+    }
+
+    function getCookie(name) {
+        var arr = document.cookie.split('; ');
+        var i = 0;
+        for (i = 0; i < arr.length; i++) {
+            //arr2->['username', 'abc']
+            var arr2 = arr[i].split('=');
+
+            if (arr2[0] == name) {
+                var getC = decodeURIComponent(arr2[1]);
+                return getC;
+            }
+        }
+        return '';
+    }
+
+    function removeCookie(name) {
+        setCookie(name, '1', -1);
+    }
+
+    function body_onload() {
+        if (0 == getCookie('param_cookie')) {
+            setcookie("param_cookie", 1, 10);
+            window.location.reload(true);
+        }
+    }
+
+
+    function save_suite_fun() {
+        var channel = prompt("请输入API(默认)或GUI：", "API");
+        var suitename = prompt("请输入用例组件名称,后缀名为.robot：", "test.robot");
+        $.ajax({
+            type: "GET",  //提交方式
+            url: "/case/save_case",//路径
+            data: {
+                "channel": channel, "suitename": suitename
+            },//数据，这里使用的是Json格式进行传输
+            success: function (result) {//返回数据根据结果进行相应的处理
+                if (result.success) {
+                    alert("保存成功！")
+                    window.location.reload()
+                } else {
+                    alert("失败")
+                }
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>

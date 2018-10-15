@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+
+    <div id="content_case">
+        <h1>历史执行报告一览表</h1>
+        <div>
+            <table border="2" class="content_width" style="table-layout: fixed;">
+                <tr>
+                    <th class="text tableTextCenter">Test</th>
+                    <th class="text tableTextCenter">API</th>
+                    <th class="text tableTextCenter">API_Doc</th>
+                    <th class="text tableTextCenter">GUI</th>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">
+                        {% for i in data %}
+                            {% if 'test_result_' in i %}
+                                 <div style="margin: 10px"><a href="../media/history/{{ i }}/report.html">{{ i }}</a></div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% for i in data %}
+                            {% if 'API_result_' in i %}
+                                 <div style="margin: 10px"><a href="../media/history/{{ i }}/report.html">{{ i }}</a></div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% for i in data %}
+                            {% if 'API_Doc_result_' in i %}
+                                <div style="margin: 10px"><a href="../media/history/{{ i }}/report.html">{{ i }}</a></div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% for i in data %}
+                            {% if 'GUI_result_' in i %}
+                                 <div style="margin: 10px"><a href="../media/history/{{ i }}/report.html">{{ i }}</a></div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}
