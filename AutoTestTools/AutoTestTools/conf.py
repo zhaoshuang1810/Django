@@ -2,8 +2,8 @@ import os
 
 dbname = 'auto_test_db'
 user = 'root'
-passd = 'root1234'
-dbhost = 'localhost'
+passd = 'root'
+dbhost = '172.16.165.133'
 port = 3306
 charset = "utf8"
 
