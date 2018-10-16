@@ -1,6 +1,6 @@
 import os
 
-url = "https://exam.zmgongzuoshi.top"
+url = "https://exam.nb01.info"
 
 # mysql
 dbHost = '172.16.164.173'

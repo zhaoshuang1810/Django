@@ -2,9 +2,12 @@
 # 忽略pyc文件
 *.pyc
 *.DS_Store
+AutoTestToolsmonitor.log
+
 
 # 忽略文件夹
 __pycache__/
 migrations/
 !migrations/__init__.py
 .idea/
+history/

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django import forms
+
 import xadmin
 from xadmin import views
 
@@ -20,8 +22,24 @@ class GlobalSetting(object):
 xadmin.site.register(views.CommAdminView, GlobalSetting)
 
 
+
+
+
+class TagForm(forms.ModelForm):
+
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.CheckboxSelectMultiple())
+
+    class Meta:
+        model = Case
+        # 规定哪些字段不想加入表单中
+        exclude = []
+
+
 @xadmin.sites.register(Case)
 class case_setting(object):
+    form = TagForm
 
     # 保存时，默认保存当前登录用户
     def save_models(self):
@@ -31,6 +49,7 @@ class case_setting(object):
     # 按顺序显示对应字段
     form_layout = (
         Fieldset(u'',
+                 Row('funmodule'),
                  Row('name'),
                  Row('documentation', ),
                  Row('business', ),
@@ -43,7 +62,7 @@ class case_setting(object):
     # 搜索字段
     search_fields = ['id', 'name']
     # listdisplay设置要显示在列表中的字段（id字段是Django模型的默认主键）
-    list_display = ('caseid', 'name', 'allTags', 'doc','writer')
+    list_display = ('caseid', 'funmodule','name', 'doc','writer')
     # 可点击链接字段
     list_display_links = ('name',)
     # 多对多，选框美化
@@ -91,6 +110,11 @@ class user_setting(object):
 
 @xadmin.sites.register(Tag)
 class tag_setting(object):
-    list_display = ('tagName', 'person', 'documentation')
+    list_display = ('tagName', 'documentation')
 
+
+@xadmin.sites.register(FunModule)
+class funmoudle_setting(object):
+    list_display = ('name', "tag", "person")
+    list_per_page = 20
 

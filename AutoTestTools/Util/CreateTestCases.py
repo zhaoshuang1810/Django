@@ -85,12 +85,17 @@ class CreateTestCases(object):
 		if documentation:
 			content.append("    [Documentation]    " + documentation + "\n")
 
-		sql = "SELECT isrun FROM `autotestapp_case` WHERE id=" + str(case_id) + ""
+		sql = "SELECT isrun FROM `autotestapp_case` WHERE id=" + str(case_id)
 		isrun = execute_sql(sql)[0][0]
 		if isrun == 1:
 			tag_content = "     [Tags]    Run"
 		else:
 			tag_content = "     [Tags]    NotRun"
+
+		sql = "SELECT b.tag FROM `autotestapp_case` a INNER JOIN `AutoTestApp_funmodule` b WHERE b.id=a.funmodule_id AND a.id=" + str(case_id)
+		funtag = execute_sql(sql)[0][0]
+		tag_content = tag_content + "    " + funtag
+
 		sql = "SELECT tagName FROM `autotestapp_tag` WHERE id IN (SELECT tag_id FROM `autotestapp_case_tags` WHERE case_id=" + str(
 			case_id) + ")"
 		tags = execute_sql(sql)

@@ -14,7 +14,7 @@ class Tag(models.Model):
 	documentation = models.TextField(verbose_name="标签描述")
 	del_flag = models.IntegerField(default=0, editable=False)
 
-	person = models.ForeignKey(AUser,verbose_name='功能负责人',blank=True,null=True)
+
 
 	class Meta:
 		verbose_name = "用例标签"
@@ -121,18 +121,37 @@ class Business(models.Model):
 			return data
 
 
+class FunModule(models.Model):
+	id = models.AutoField(primary_key=True)
+	name = models.CharField(max_length=50, verbose_name="功能名称", unique=True)
+	tag = models.CharField(max_length=50, verbose_name="标签名称", unique=True, help_text="输入英文")
+	documentation = models.TextField(verbose_name="功能描述描述", blank=True)
+	del_flag = models.IntegerField(default=0, editable=False)
+
+	person = models.ForeignKey(AUser, verbose_name='功能负责人', blank=True, null=True)
+
+	class Meta:
+		verbose_name = "功能模块"
+		verbose_name_plural = verbose_name
+		ordering = ['name']
+
+	def __str__(self):
+		return self.name
+
+
 class Case(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=50, verbose_name="用例名称", unique=True)
 	isrun = models.IntegerField(choices=((1, "执行"), (2, "不执行")), default=1, verbose_name="是否执行")
-	tags = models.ManyToManyField(Tag, blank=True, verbose_name="用例标识")
-	business = models.ManyToManyField('Business', verbose_name="用例流程")
+	tags = models.ManyToManyField(Tag, blank=True, verbose_name="用例标签")
+	business = models.ManyToManyField('Business', verbose_name="用例流程",blank=True)
 	documentation = models.TextField(verbose_name="用例描述", blank=True)
 	sort = models.IntegerField(verbose_name="排序", default=999)
 	date = models.DateField(auto_now=True)
 	del_flag = models.IntegerField(default=0, editable=True)
 
 	writer = models.ForeignKey(AUser,on_delete=models.CASCADE,blank=True,null=True)
+	funmodule = models.ForeignKey(FunModule,on_delete=models.CASCADE,verbose_name="功能模块")
 
 	def doc(self):
 		if len(str(self.documentation)) > 60:
@@ -153,6 +172,3 @@ class Case(models.Model):
 
 	def __str__(self):
 		return self.name
-
-
-
