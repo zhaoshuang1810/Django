@@ -26,8 +26,8 @@ class SelectMultipleTransfer(forms.SelectMultiple):
 
     def render_opt(self, selected_choices, option_value, option_label):
         option_value = force_text(option_value)
-        return u'<option value="%s">%s</option>' % (
-            escape(option_value), conditional_escape(force_text(option_label))), bool(option_value in selected_choices)
+        return u'<option value="%s" title="%s">%s</option>' % (
+            escape(option_value),conditional_escape(force_text(option_label)), conditional_escape(force_text(option_label))), bool(option_value in selected_choices)
 
     def render(self, name, value, attrs=None, choices=()):
         if attrs is None:
