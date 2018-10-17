@@ -10,9 +10,9 @@ from django.shortcuts import render
 
 # Create your views here.
 import run_cmd
-from AutoTestApp.models import Case
+from AutoTestApp.models import Case,FunModule
 from AutoTestApp.models import Tag
-from AutoTestTools.mysql import get_sql_data
+from AutoTestTools.mysql import get_sql_data_funid
 from Conf.Properties import case_dir, media_dir
 from Util.CreateTestCases import CreateTestCases
 from Util.RFMethodName import CaseName
@@ -72,16 +72,20 @@ def run_tagcase(request):
 def case(request):
 	tags = [(t.id,t.tagName) for t in Tag.objects.all().order_by('tagName')]
 	tags.insert(0,('0',""))
+	funs = [(f.id,f.tag+"("+f.name+")") for f in FunModule.objects.all().order_by('tag')]
+	keyword_fun = request.GET.get("keyword_fun")
 	keyword_name = request.GET.get("keyword_name")
 	keyword_tag = request.GET.get("keyword_tag")
-	data = search_keywords(get_sql_data(), keyword_name=keyword_name, keyword_tag=keyword_tag)
-	return render(request, 'case.html', {'data': data,"tags":tags})
+	if not keyword_fun:
+		keyword_fun = 'BasicFunction(基础功能)'
+	funid = FunModule.objects.get(tag=keyword_fun.split('(')[0]).id
+	data = search_keywords(get_sql_data_funid(funid), keyword_name=keyword_name, keyword_tag=keyword_tag)
+	return render(request, 'case.html', {'data': data, "funs": funs, "func": keyword_fun, "tags": tags})
 
 
 def del_data(request):
 	del_num = request.GET.get("del")
 	Case.objects.filter(id=del_num).update(del_flag=1)
-
 	resp = {"success": True}
 	return HttpResponse(json.dumps(resp), content_type="application/json")
 

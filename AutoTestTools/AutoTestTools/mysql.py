@@ -1,4 +1,4 @@
-#coding=utf-8
+# coding=utf-8
 import pymysql
 from AutoTestTools.conf import dbhost, port, user, passd, dbname, charset
 from Conf.Properties import bus_dir
@@ -13,6 +13,7 @@ def execute_sql(sql):  # 获取数据库的数据
 	cur.close()
 	conn.close()
 	return results
+
 
 def get_business_sql(case_id):
 	sql_business = "SELECT b.business_id,c.`name`,c.nameEn,c.params FROM (`autotestapp_business` a  LEFT JOIN `autotestapp_business_basic` c on  a.bus_basic_id=c.id) inner join `autotestapp_case_business` b on a.id=b.business_id WHERE b.case_id=" + str(
@@ -43,9 +44,17 @@ def get_business_sql(case_id):
 			sql_params_data = list(execute_sql(sql_params))
 			sql_params_data.sort()
 			p1 = []
+
 			for i in range(len(b3)):
 				index = b3_sort.index(b3[i])
-				s = b3[i] + "=" + sql_params_data[index][1]
+				try:
+					datainfo = sql_params_data[index][1]
+				except:
+					print(business[1])
+					print("实参：" ,str(b3))
+					print("传参：", str(sql_params_data))
+					datainfo = "参数错误！"
+				s = b3[i] + "=" + datainfo
 				p1.append(s)
 			b1.append("；".join(p1))
 		b_data.append(b1)
@@ -54,6 +63,33 @@ def get_business_sql(case_id):
 
 def get_sql_data():
 	sql = "SELECT id,`name`,documentation,sort FROM `autotestapp_case` WHERE del_flag=0 order by sort,id"
+	sql_data = execute_sql(sql)
+	data = []
+	for i in range(len(sql_data)):
+		d1 = []
+		for s in sql_data[i]:
+			d1.append(s)
+
+		case_id = sql_data[i][0]
+		sql_tag = "SELECT tagName FROM `autotestapp_case_tags` AS ct ,`autotestapp_tag` AS t WHERE  ct.tag_id=t.id AND t.del_flag=0 AND ct.case_id=" + str(
+			case_id)
+		sql_tag_data = execute_sql(sql_tag)
+		tags = []
+		for tag in sql_tag_data:
+			tags.append(tag[0])
+		d1.append(",".join(tags))
+
+		d1.append(get_business_sql(case_id))
+		data.append(d1)
+	return data
+
+
+def get_sql_data_funid(funid):
+	if funid:
+		sql = "SELECT id,`name`,documentation,sort FROM `autotestapp_case` WHERE del_flag=0 AND funmodule_id=" + str(
+			funid) + " order by sort,id"
+	else:
+		sql = "SELECT id,`name`,documentation,sort FROM `autotestapp_case` WHERE del_flag=0 order by sort,id"
 	sql_data = execute_sql(sql)
 	data = []
 	for i in range(len(sql_data)):

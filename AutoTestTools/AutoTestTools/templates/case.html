@@ -11,15 +11,24 @@
                     <div id="header-search-box">
                         <form action="case" role="search" method="get" id="searchform" action="{% url 'case' %}">
                             {% csrf_token %}
-                            <span>用例名称：</span>
-                            <input type="search" name="keyword_name" placeholder="输入用例名称……">
+                             <span>功能模块：</span>
+                                 <select type="search" id="keyword_fun" name="keyword_fun" >
+                                    {% for op in funs %}
+                                        {% if op.1 ==  func %}
+                                             <option id="{{ op.0 }}" value="{{ op.1 }}" selected>{{ op.1 }}</option>
+                                        {% else %}
+                                             <option id="{{ op.0 }}" value="{{ op.1 }}">{{ op.1 }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
                             <span>用例标签：</span>
                              <select type="search" id="keyword_tag" name="keyword_tag" >
                                 {% for op in tags %}
                                     <option id="{{ op.0 }}" value="{{ op.1 }}">{{ op.1 }}</option>
                                 {% endfor %}
                             </select>
-{#                            <input type="search" name="keyword_tag" placeholder="输入用例标签……">#}
+                            <span>用例名称：</span>
+                            <input style="width: 200px" type="search" name="keyword_name" placeholder="输入用例名称……">
                             <button type="submit"><span class="ion-ios-search-strong">搜 索</span></button>
                         </form>
                     </div>
@@ -66,7 +75,7 @@
             <tr >
                 <th width="50" class="text tableTextCenter"><input type="checkbox" onclick="swapCheck()">
                 </th>
-                <th width="50" class="text tableTextCenter">用例编号</th>
+{#                <th width="50" class="text tableTextCenter">用例编号</th>#}
                 <th width="300" class="text tableTextCenter">用例名称</th>
                 <th width="100" class="text tableTextCenter">用例标签</th>
                 <th class="text tableTextCenter" colspan="2">
@@ -86,7 +95,7 @@
                     <tr>
                         <td class="text tableTextCenter" rowspan="{{ i.5|length }}"><input type="checkbox" name="goods"
                                                                 value={{ i.0 }}></td>
-                        <td class="text tableTextCenter" rowspan="{{ i.5|length }}">{{ i.0}}</td>
+{#                        <td class="text tableTextCenter" rowspan="{{ i.5|length }}">{{ i.0}}</td>#}
                         <td  rowspan="{{ i.5|length }}" style="vertical-align: middle;" name="name" value={{ i.1 }}>{{ i.1 }}</td>
                         <td rowspan="{{ i.5|length }}" class="text tableTextCenter">{{ i.4 }}</td>
                         <td style="vertical-align: middle;">
@@ -103,7 +112,7 @@
                                                                 value={{ i.3 }}></td>
                         <td  rowspan="{{ i.5|length }}" class="text tableTextCenter">
                             <button type="button" class="nt" trId={{ i.0 }}>修改排序</button>
-                            <button><a href="/admin/AutoTestApp/case/{{ i.0 }}/change/" target="_blank"
+                            <button><a href="/xadmin/AutoTestApp/case/{{ i.0 }}/update/" target="_blank"
                                        type="button">修改详情</a></button>
 
                         </td>

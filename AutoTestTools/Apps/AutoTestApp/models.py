@@ -14,8 +14,6 @@ class Tag(models.Model):
 	documentation = models.TextField(verbose_name="标签描述")
 	del_flag = models.IntegerField(default=0, editable=False)
 
-
-
 	class Meta:
 		verbose_name = "用例标签"
 		verbose_name_plural = verbose_name
@@ -49,7 +47,7 @@ class Data(models.Model):
 class Business_basic(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=30, verbose_name="业务名称", unique=True)
-	nameEn = models.CharField(max_length=30, verbose_name="英文名称", default='EnglishName', help_text="英文名称，执行用例时用")
+	nameEn = models.CharField(max_length=30, verbose_name="英文名称", unique=True, help_text="英文名称，执行用例时用")
 	params = models.CharField(max_length=60, verbose_name="参数", blank=True, help_text="参数个数，参数类型……")
 	documentation = models.TextField(verbose_name="业务描述", blank=True, help_text="业务实现的功能")
 	del_flag = models.IntegerField(default=0, editable=False)
@@ -67,6 +65,7 @@ class Business_basic(models.Model):
 
 	def __str__(self):
 		return self.name + " " + self.params
+
 
 class User(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -144,14 +143,14 @@ class Case(models.Model):
 	name = models.CharField(max_length=50, verbose_name="用例名称", unique=True)
 	isrun = models.IntegerField(choices=((1, "执行"), (2, "不执行")), default=1, verbose_name="是否执行")
 	tags = models.ManyToManyField(Tag, blank=True, verbose_name="用例标签")
-	business = models.ManyToManyField('Business', verbose_name="用例流程",blank=True)
+	business = models.ManyToManyField('Business', verbose_name="用例流程", blank=True)
 	documentation = models.TextField(verbose_name="用例描述", blank=True)
 	sort = models.IntegerField(verbose_name="排序", default=999)
 	date = models.DateField(auto_now=True)
 	del_flag = models.IntegerField(default=0, editable=True)
 
-	writer = models.ForeignKey(AUser,on_delete=models.CASCADE,blank=True,null=True)
-	funmodule = models.ForeignKey(FunModule,on_delete=models.CASCADE,verbose_name="功能模块")
+	writer = models.ForeignKey(AUser, on_delete=models.CASCADE, blank=True, null=True)
+	funmodule = models.ForeignKey(FunModule, on_delete=models.CASCADE, verbose_name="功能模块")
 
 	def doc(self):
 		if len(str(self.documentation)) > 60:
@@ -163,12 +162,12 @@ class Case(models.Model):
 		return ",".join([t.tagName for t in self.tags.all()])
 
 	def caseid(self):
-		return 'TestCase' +  str(self.id).zfill(3)
+		return 'TestCase' + str(self.id).zfill(3)
 
 	class Meta:
 		verbose_name = "测试用例"
 		verbose_name_plural = verbose_name
-		ordering = ['sort']
+		ordering = ['funmodule', 'sort']
 
 	def __str__(self):
 		return self.name
